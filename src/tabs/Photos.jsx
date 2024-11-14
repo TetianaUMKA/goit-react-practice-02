@@ -1,6 +1,10 @@
 import { getPhotos } from "apiService/photos";
 import { Button, Form, Loader, PhotosGallery, Text } from "components";
+import { ImageModal } from "components/ImageModal/ImageModal";
+
+import { set } from "date-fns";
 import { useEffect, useState } from "react";
+import React from "react";
 
 export const Photos = () => {
   const [query, setQuery] = useState("");
@@ -10,6 +14,21 @@ export const Photos = () => {
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [srcModal, setSrcModal] = useState("");
+  const [altModal, setAltModal] = useState("");
+
+  function openModal(src, alt) {
+    setIsOpen(true);
+    setSrcModal(src);
+    setAltModal(alt);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+    setSrcModal("");
+    setAltModal("");
+  }
 
   useEffect(() => {
     if (!query) {
@@ -48,7 +67,9 @@ export const Photos = () => {
   return (
     <>
       <Form onSubmit={handleSubmit} />
-      {images.length > 0 && <PhotosGallery images={images} />}
+      {images.length > 0 && (
+        <PhotosGallery images={images} openModal={openModal} />
+      )}
       {isVisible && !isLoading && !isEmpty && (
         <Button onClick={handleLoadMore} disabled={isLoading}>
           {isLoading ? "Loaging" : "Load more"}
@@ -64,6 +85,12 @@ export const Photos = () => {
       {isEmpty && (
         <Text textAlign="center">Sorry. There are no images ... 😭</Text>
       )}
+      <ImageModal
+        modalIsOpen={modalIsOpen}
+        closeModal={closeModal}
+        src={srcModal}
+        alt={altModal}
+      />
     </>
   );
 };
